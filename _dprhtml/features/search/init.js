@@ -226,6 +226,35 @@ export const initializeSidebarTab = async () => {
 export const initializeFeature = async (sectionId) => {
   await DPR_config_mod.getconfig()
   setSearchParams()
+  // console.log('Attaching search result click handler');
+  // Attach click handlers to search result links using event delegation
+  $('#main-pane-container').on('click', 'a', function (event) { // eslint-disable-line func-names
+    // Check if the clicked link is a search result link (e.g., based on its parent or data attributes)
+    // For now, let's assume all 'a' tags within #sbfab are search result links
+    if ($(this).closest('#sbfab').length > 0) {
+      event.preventDefault() // Prevent default link behavior
+
+      const link = $(this)
+      const nikaya = link.data('nikaya')
+      const book = link.data('book')
+      const sx = link.data('sx')
+      const sy = link.data('sy')
+      const sz = link.data('sz')
+      const s = link.data('s')
+      const se = link.data('se')
+      const hiert = link.data('hiert')
+      const tmp = link.data('tmp')
+      const sraout = link.data('sraout')
+
+      // Check if data attributes are available before calling the function
+      if (nikaya && book !== undefined && sx !== undefined && sy !== undefined
+        && sz !== undefined && s !== undefined && se !== undefined && hiert && tmp !== undefined && sraout !== undefined) {
+        DPR_Search.openSearchResultInNewTab(nikaya, book, sx, sy, sz, s, se, hiert, tmp, sraout)
+      } else {
+        // console.error('Missing data attributes on search result link', link)
+      }
+    }
+  })
   await DPR1_search_mod.searchTipitaka(
     sectionId,
     DPR_G.searchType,

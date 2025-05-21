@@ -469,13 +469,13 @@ const DPR_Search = (function () {
 
   }
 
-  function createTdForMatch(dups, match) {
+  function createTdForMatch(dups, match, sectionId, nikaya, book, sx, sy, sz, s, se, hiert, tmp, sraout) {
     if (!match) {
       return '';
     }
 
     const linkText = normalizeLongSearchResult(match);
-    return `<a href="javascript:void(0);" title="${DPR_translit_mod.translit(match)}" onclick="DPR1_search_mod.showonly('${match.replace(/\"/g, 'x')}')">${DPR_translit_mod.translit(linkText)}</a> (${dups[match]})`;
+    return `<a href="javascript:void(0);" title="${DPR_translit_mod.translit(match)}" data-nikaya="${nikaya.replace(/"/g, '"')}" data-book="${book - 1}" data-sx="${sx}" data-sy="${sy}" data-sz="${sz}" data-s="${s}" data-se="${se}" data-hiert="${hiert.replace(/"/g, '"')}" data-tmp="${tmp + 1}" data-sraout="${sraout.replace(/"/g, '"')}">${DPR_translit_mod.translit(linkText)}</a> (${dups[match]})`;
   }
 
   function createTables(xmlDoc,hiert)
@@ -904,7 +904,7 @@ const DPR_Search = (function () {
 
 
                     // paragraph
-                    finalout += ', para. ' + (tmp + 1) + ' <span class="abut obut" onmouseup="DPR1_send_mod.openPlace(' + `${sectionId}, ` + '[\''+nikaya+'\',' + (book - 1) + ',' + sx + ',' + sy + ',' + sz + ',' + s + ',' + se + ',\''+hiert+'\'],' + (tmp+1) + ',\'' + sraout + '\',\'search\')">&rArr;</span></span></p><p>' + DPR1_format_mod.preparepali(sectionId,postpara,3)[0] + '</p><hr></div>';
+                    finalout += ', para. ' + (tmp + 1) + ' <span class="abut obut" onmouseup="DPR_Search.openSearchResultInNewTab(\''+nikaya.replace(/'/g, '\\\'')+'\', ' + (book - 1) + ', ' + sx + ', ' + sy + ', ' + sz + ', ' + s + ', ' + se + ', \''+hiert.replace(/'/g, '\\\'')+'\', ' + (tmp + 1) + ', \'' + sraout.replace(/'/g, '\\\'')+'\')">&rArr;</span></span></p><p>' + DPR1_format_mod.preparepali(sectionId,postpara,3)[0] + '</p><hr></div>';
 
                     // mumble mumble
 
@@ -957,7 +957,7 @@ const DPR_Search = (function () {
           exwordout += '<td valign="top">';
           for (var ex = 0; ex < exnodups[t].length; ex++)
           {
-            exwordout += `<div>${createTdForMatch(dups, exnodups[t][ex])}</div>`;
+            exwordout += `<div>${createTdForMatch(dups, exnodups[t][ex], sectionId, nikaya, book, sx, sy, sz, s, se, hiert, tmp, sraout)}</div>`;
           }
           exwordout += '</td>';
         }
@@ -989,7 +989,7 @@ const DPR_Search = (function () {
 
         for (var ex = 0; ex < findiv; ex++)
         {
-          exwordout += `<tr><td>${createTdForMatch(dups, exnodups[ex])}</td><td>${createTdForMatch(dups, exnodups[findiv + ex])}</td></tr>`;
+          exwordout += `<tr><td>${createTdForMatch(dups, exnodups[ex], sectionId, nikaya, book, sx, sy, sz, s, se, hiert, tmp, sraout)}</td><td>${createTdForMatch(dups, exnodups[findiv + ex], sectionId, nikaya, book, sx, sy, sz, s, se, hiert, tmp, sraout)}</td></tr>`;
         }
         exwordout += '</table>';
       }
@@ -1031,6 +1031,12 @@ const DPR_Search = (function () {
       document.getElementById('showing').style.display = 'block';
       DPR_move_mod.scrollToId('search','sbfb');
     }
+  }
+function openSearchResultInNewTab(nikaya, book, meta, volume, vagga, sutta, section, hiert, para, stringra) {
+  
+    var permalink = DPR_PAL.toWebUrl('chrome://digitalpalireader/content/index.xul' + '?loc='+nikaya+'.'+book+'.'+meta+'.'+volume+'.'+vagga+'.'+sutta+'.'+section+'.'+hiert+(stringra ? '&query=' + stringra : '')+(para ? '&para=' + para : ''));
+    DPR1_chrome_mod.openDPRTab(permalink, null, false); // Call without an ID and explicitly prevent reuse
+    console.log('openSearchResultInNewTab called', permalink);
   }
 
   function atiPause(getstring) {
@@ -1290,6 +1296,7 @@ const DPR_Search = (function () {
     searchTipitaka,
     showonly,
     stopSearch,
+    openSearchResultInNewTab,
   }
 })()
 
