@@ -9,6 +9,10 @@ echo "SOURCEDIR = $SOURCEDIR"
 
 mkdir -p $OUTDIR
 
+# Convert line endings for live-server executable
+echo "Converting line endings for live-server.js"
+dos2unix node_modules/live-server/live-server.js
+
 cd ./_dprhtml
 chmod +x ./build.sh
 ./build.sh $OUTDIR $SOURCEDIR
